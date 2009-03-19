@@ -1,0 +1,39 @@
+<% form ||= @form %>
+<% form_submission ||= @form_submission %>
+<% url ||= form_form_submissions_path(form) %>
+
+<h2><%= form.name %></h2>
+
+<% form_for :form_submission, form_submission, :url => url, :html => {:class => 'form_submission_form'} do |f| %>
+  <% unless form.instructions.blank? %>
+    <p><%= form.instructions %></p>
+  <% end %>
+  <%= f.form_submission_error_messages %>
+  <% form.form_fields.each do |field| %>
+    <% options = {}
+      select_options = nil
+      options[:size] = (!field.max_length.blank? && field.max_length < 50) ? field.max_length : 50
+    %>
+    <% if field.kind == 'select'
+        select_options = options
+        select_options[:include_blank] = true unless field.required?
+        options = field.select_options
+      end %>
+    <% if field.kind == 'check_box_group' 
+        select_options = options
+        select_options[:source] = form_submission.send(field.name)
+        options = field.check_box_group_collection
+      end %>
+    <div>
+      <%= f.label field.name, field.label %>
+      <% if select_options %>
+        <%= f.send(field.kind.to_sym, field.name, options, select_options) %>
+      <% else %>
+        <%= f.send(field.kind.to_sym, field.name, options) %>
+      <% end %>
+    </div>
+  <% end %>
+  <div>
+    <%= f.submit form.submit_label %>
+  </div>
+<% end %>

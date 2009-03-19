@@ -1,0 +1,73 @@
+<% f ||= form %>
+
+<div>
+  <%= f.label :name, "Form Name" %>
+  <%= f.text_field :name %>
+</div>
+<div>
+  <%= f.label :instructions, "Form Instructions (optional)" %>
+  <%= f.text_area :instructions %>
+</div>
+
+<div>
+  <%= f.label :submit_label, "Submit Button Label" %>
+  <%= f.text_field :submit_label %>
+</div>
+
+<div>
+  <%= f.label :active, "Active?" %>
+  <%= f.check_box :active %>
+</div>
+
+<table>
+  <tr>
+    <td style="vertical-align: top;">
+      <div class="column" id="left_column">
+        <p>Add fields using the links on the right and drag boxes to reorder.</p>
+        <div id="form_fields">
+          <%= render :partial => "forms/form_field", :collection => @form.form_fields, :locals => {:f => f} %>
+        </div>
+      </div>
+
+      <script type="text/javascript" charset="utf-8">
+        function make_form_fields_sortable() {
+          Sortable.create("form_fields", {tag: 'div', onChange: function(el) {
+            var current_child = $('form_fields').down('div');
+            var counter = 1;
+            while(current_child){
+              current_child.down('.position').value = counter;
+              current_child = current_child.next('div');
+              counter += 1;
+            };
+          }});
+        }
+        make_form_fields_sortable();
+      </script>
+    </td>
+    <td style="vertical-align: bottom;">
+      <div class="column" id="right_column">
+        <%= content_tag(:input, '', :type => 'hidden', :id => 'fields_count', :value => @form.form_fields.length) %>
+
+        <div id="add_fields" style="height: 100%;">
+          <h4 class="header">Add Another Field...</h4>
+          <ul id="add_field_links">
+          <% FormField::TYPES.each do |field_type| %>
+            <li>
+              <%= link_to_function "Add a #{field_type.titleize}" do |page|
+                  page.insert_html :bottom, 'form_fields', :partial => "forms/form_field", :object => @form.send(field_type.pluralize.to_sym).build, :locals => {:f => f, :counter => ''}
+                  page << "$('form_fields').down('.field', parseInt($('fields_count').value)).select('input').each(function(inp){inp.name = inp.name.split('[]').join('[' + parseInt($('fields_count').value) + ']')})"
+                  page << "$('form_fields').down('.field', parseInt($('fields_count').value)).select('textarea').each(function(inp){inp.name = inp.name.split('[]').join('[' + parseInt($('fields_count').value) + ']')})"
+                  page << "$('form_fields').down('.field', parseInt($('fields_count').value)).down('.position').value = parseInt($('fields_count').value) + 1;"
+                  page << "$('fields_count').value = parseInt($('fields_count').value) + 1;"
+                  page << 'make_form_fields_sortable();'
+                end
+              %>
+            </li>
+          <% end %>
+          </ul>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </td>
+  </tr>
+</table>

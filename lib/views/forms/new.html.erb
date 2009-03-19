@@ -1,0 +1,16 @@
+<% if @form_submission %>
+  <h2>Form Preview:</h2>
+  <%= render :partial => 'form_submissions/submission_block' %>
+<% end %>
+
+<h2>New Form</h2>
+
+<% form_for :form, @form, :url => forms_path, :html => {:id => "form_creator"} do |f| %>
+  <fieldset id="form">
+    <%= render :partial => 'form', :object => f %>
+    <div class="form_item submit">
+      <%= f.submit "Preview", :value => 'Preview' %> or 
+      <%= f.submit "Create Form" %>
+    </div>
+  </fieldset>
+<% end %>

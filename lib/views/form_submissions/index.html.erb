@@ -1,0 +1,24 @@
+<h2>Form Submissions for <%= @form.name %></h2>
+
+<ul>
+  <li><%= link_to 'New Submission', new_form_form_submission_path(:form_id =>@form) %></li>
+</ul>
+
+<table>
+  <thead>
+    <tr>
+      <th>Filled Out</th>
+      <th class="actions">&nbsp;</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @form_submissions.each do |fs| %>
+      <tr>
+        <td><%= fs.created_at %></td>
+        <td class="actions">
+          <%= link_to 'Show', form_form_submission_path(:form_id => @form, :id => fs)  %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

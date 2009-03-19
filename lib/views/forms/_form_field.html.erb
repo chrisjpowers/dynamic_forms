@@ -1,0 +1,40 @@
+<% field = form_field %>
+<% counter ||= form_field_counter - 1 %>
+<% f.fields_for field do |ff| %>
+  <div class="field <%= form_field.kind %>">
+    <h4><%= form_field.kind.titleize %></h4>
+    <%= ff.hidden_field :id,        :name => "form[#{form_field.kind}][#{counter}][id]" unless field.new_record? %>
+    <%= ff.hidden_field :position,  :name => "form[#{form_field.kind}][#{counter}][position]", :class => 'position' %>
+    <div>
+      <label>Label</label>
+      <%= ff.text_field :label,       :name => "form[#{form_field.kind}][#{counter}][label]" %>
+    </div>
+    
+    <% if field.is_selector? %>
+      <p>Please enter the possible values separated by commas.</p>
+      <div>
+        <%= ff.text_area :options_string, :label => 'Options', :name => "form[#{form_field.kind}][#{counter}][options_string]" %>
+      </div>
+    <% end %>
+    
+    <div class="validation">
+      <% if field.allow_validation_of? :required %>
+        <label>Required?</label>  
+        <%= ff.check_box :required,     :name => "form[#{form_field.kind}][#{counter}][required]" %>
+      <% end %>
+      <% if field.allow_validation_of? :number %>
+        <label>Number?</label>    
+        <%= ff.check_box :number,       :name => "form[#{form_field.kind}][#{counter}][number]" %>
+      <% end %>
+      <% if field.allow_validation_of? :min_length %>
+        <label>Min Chars</label>  
+        <%= ff.text_field :min_length,  :name => "form[#{form_field.kind}][#{counter}][min_length]", :size => 3 %>
+      <% end %>
+      <% if field.allow_validation_of? :max_length %>
+        <label>Max Chars</label>  
+        <%= ff.text_field :max_length,  :name => "form[#{form_field.kind}][#{counter}][max_length]", :size => 3 %>
+      <% end %>
+      <span class="remove_field_link"><%= link_to_function "Remove", "$(this).up('.field').remove(); $('fields_count').value = parseInt($('fields_count').value) - 1;" %></span>
+    </div>
+  </div>
+<% end %>
