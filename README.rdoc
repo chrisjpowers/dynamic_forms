@@ -1,13 +1,27 @@
-DynamicForms
-============
+= DynamicForms
 
-Introduction goes here.
+Created by Chris Powers, March 19, 2009
 
+Thanks to Jacob Basham (http://github.com/jkster) for his additions and refactoring.
 
-Example
-=======
+== Make Your Own Forms
 
-Example goes here.
+The DynamicForms plugin simply drops in the controllers, models, helpers and views you need to allow your users to create their own forms on your Web app. These forms act like regular Rails forms, using validation, error checking, the works.
 
+Once you've installed the plugin and all the files have been copied into your app, feel free to customize as you see fit. Here's a few suggestions:
 
-Copyright (c) 2009 [name of plugin creator], released under the MIT license
+* You will probably want to add relationships between Forms, FormSubmissions and your user/account model, assuming you want users to has_many :forms and/or has_many :form_submissions
+* You will also probably want to add your login authentication to the FormsController and FormSubmissionsController
+* I tried not to presuppose much in terms of styling, CSS class names, etc., so you will need to significantly alter some of the views to integrate them into your app
+
+For those of you who can make use of this plugin, I hope that this saves you a lot of time!
+
+== TODO
+
+* Better Documentation
+* Rspec and Cucumber Tests
+* Make Javascript Unobtrusive
+* Default Stylesheet
+* More Field Choices
+
+Copyright (c) 2009 Chris Powers, released under the MIT license

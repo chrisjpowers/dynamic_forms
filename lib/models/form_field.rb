@@ -57,7 +57,7 @@ class FormField < ActiveRecord::Base
   def options_string=(str)
     self.form_field_options.delete_all
     arr = str.split(',')
-    arr.each {|l| self.form_field_options.build(:label => l.strip, :value => l.strip)}
+    arr.each_with_index {|l, i| self.form_field_options.build(:label => l.strip, :value => l.strip, :position => i)}
   end
   
   def name
