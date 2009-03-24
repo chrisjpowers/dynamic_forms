@@ -1,10 +1,16 @@
+# Helpers for displaying FormSubmission data
 module FormSubmissionsHelper
   
   def self.included(base)
     ActionView::Helpers::FormBuilder.send :include, FormBuilderMethods
   end
   
+  # mixes in FormBuilder#form_submission_error_messages method
   module FormBuilderMethods
+    
+    # Use instead of FormBuilder#error_messages when working with FormSubmissions,
+    # works the same but uses the attribute's label rather than its name
+    # (the name is jibberish)
     def form_submission_error_messages
       raise unless @object.is_a?(FormSubmission)
       msg = error_messages
@@ -13,33 +19,63 @@ module FormSubmissionsHelper
     end
   end
   
-  # Developed by Chris Powers, Killswitch Collective on 10/22/2008
-  #
-  # Formats the value of a FormSubmission's field
+  # Instantiates a FormSubmissionFieldDisplay object
+  # 
+  # To use the default formatting markup, just pass the field name and value:
+  # 
+  #   <% @form_submission.each_field do |field, value| %>
+  #       <%= format_submission_field(field, value) %>
+  #   <% end %>
+  # 
+  # If you want to use your own custom markup instead, pass a block with label 
+  # and value block params:
+  # 
+  #   <dl>
+  #     <% @form_submission.each_field do |field, value| %>
+  #       <% format_submission_field(field, value) do |label, val| %>
+  #         <dt><%= label %></dt>
+  #         <dd><%= val %></dd>
+  #       <% end %>
+  #     <% end %>  
+  #   </dl>
+  # 
+  def format_submission_field(field, value, &block)
+    FormSubmissionFieldDisplay.new(self, field, value, &block)
+  end
+  
+  # Helper class that formats the value of a FormSubmission's field
   class FormSubmissionFieldDisplay
     
+    # String output representing a blank response
     NO_RESPONSE = "(no response)"
+    
+    # String output for 'true'
     TRUE_VALUE = "Yes"
+    
+    # String output for 'false'
     FALSE_VALUE = "No"
     
+    # Do not instantiate directly, use the #formate_submission_field method instead
     def initialize(template, field, value, &block)
       @field = field
       @value = value
       @template = template
-      @block = block # need to capture?
+      if @block = block
+        to_s # render when block passed in <% ... %> tags
+      end
     end
     
+    # used to output the generated markup
     def to_s
       label = @field.label
       val = @template.send(:h, formatted_value)
       if @block
-        @block.call(label, val)
+        @template.concat(@template.capture(label, val, &@block), @block.binding)
       else
       <<-EOF
 <div class="form_submission_field_display">
   <strong class="label">#{label}</strong>
   <span class="response">#{val}</span>
-  <div class="clearer"></div>
 </div>
 EOF
       end
@@ -47,6 +83,7 @@ EOF
     
     private
     
+    # formats value as a list, value or boolean based on the type of form field
     def formatted_value
       if @field.has_many_responses?
         # ensure value is an array
@@ -64,10 +101,6 @@ EOF
     def value_with_blank_notice(val = nil)
       val.blank? ? NO_RESPONSE : val
     end
-  end
-  
-  def format_submission_field(field, value)
-    FormSubmissionFieldDisplay.new(self, field, value)
   end
 
 end
